@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Choices — Fashion, Home Decor & Beauty Picks</title>
+<title>Style Finds — Fashion, Home Decor & Beauty Picks</title>
 <meta name="description" content="Handpicked fashion, home decor and beauty finds at the best prices. Shop our curated picks.">
 <style>
 :root{
@@ -77,12 +77,12 @@ footer a{color:var(--muted)}
 <body>
 <header>
   <div class="wrap topbar">
-    <div class="logo">My<span>Choices</span><span class="tagline">curated picks, best prices</span></div>
+    <div class="logo">Style<span>Finds</span><span class="tagline">curated picks, best prices</span></div>
     <div class="search"><input id="q" type="search" placeholder="Search products… (e.g. kurti, lamp, lipstick)" autocomplete="off"></div>
     <button class="iconbtn" id="themeBtn" title="Dark / Light">🌙</button>
   </div>
 </header>
-<div class="disclosure">💡 My Choices may earn a commission when you buy through links on this page — at no extra cost to you.</div>
+<div class="disclosure">💡 Style Finds may earn a commission when you buy through links on this page — at no extra cost to you.</div>
 <div class="wrap">
   <div class="chips" id="chips"></div>
   <div class="toolbar">
@@ -99,7 +99,7 @@ footer a{color:var(--muted)}
 </div>
 <footer>
   <div class="wrap cols">
-    <div><h4>My Choices</h4><p>Handpicked fashion, home decor &amp; beauty products<br>at prices you'll love. New picks added regularly.</p></div>
+    <div><h4>Style Finds</h4><p>Handpicked fashion, home decor &amp; beauty products<br>at prices you'll love. New picks added regularly.</p></div>
     <div><h4>Shop</h4><p id="footCats">Fashion · Home Decor · Beauty</p></div>
     <div><h4>Owner</h4><a class="ownerlink" id="ownerLink" href="#" target="_blank" rel="noopener">📊 Manage products (Google Sheet)</a></div>
   </div>
@@ -112,6 +112,14 @@ const SHEET_WEB_URL = "https://docs.google.com/spreadsheets/d/11SkJRSO9GX-t_ynEn
 
 const $ = id => document.getElementById(id);
 const grid=$('grid'), state=$('state'), chipsEl=$('chips'), countEl=$('count');
+const FALLBACK_PRODUCTS=[
+  {cat:'Fashion', name:'Printed Cotton Kurti', price:899, mrp:1499, img:'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=900&q=80', link:'https://www.amazon.in/s?k=printed+cotton+kurti', desc:'Breathable everyday wear with a relaxed fit.', tag:'Best Seller'},
+  {cat:'Fashion', name:'Minimal Gold Earrings', price:649, mrp:1199, img:'https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=900&q=80', link:'https://www.amazon.in/s?k=gold+earrings', desc:'Lightweight statement earrings for day-to-night styling.', tag:'New'},
+  {cat:'Home Decor', name:'Warm Glow Table Lamp', price:1299, mrp:2199, img:'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80', link:'https://www.amazon.in/s?k=table+lamp', desc:'Soft ambient lighting to cozy up any corner.', tag:'Home Edit'},
+  {cat:'Home Decor', name:'Textured Throw Pillow Set', price:799, mrp:1599, img:'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80', link:'https://www.amazon.in/s?k=throw+pillow+set', desc:'Adds instant color and comfort to your sofa.', tag:'Soft Touch'},
+  {cat:'Beauty', name:'Rose Glow Lipstick', price:499, mrp:899, img:'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=900&q=80', link:'https://www.amazon.in/s?k=rose+lipstick', desc:'Hydrating tint with a natural satin finish.', tag:'Trending'},
+  {cat:'Beauty', name:'Silk Finish Face Serum', price:1099, mrp:1799, img:'https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=900&q=80', link:'https://www.amazon.in/s?k=face+serum', desc:'Skin-loving glow boost for everyday radiance.', tag:'Glow Up'}
+];
 let PRODUCTS=[], activeCat='All', query='', sortBy='featured';
 let saved=[]; try{ saved=JSON.parse(localStorage.getItem('sf_saved')||'[]'); }catch(e){}
 
@@ -151,7 +159,8 @@ function loadProducts(){
     if(!PRODUCTS.length) throw 0;
     state.style.display='none'; buildChips(); render();
   }).catch(()=>{
-    state.innerHTML='<h2>Products load nahi ho rahe 😅</h2><p>Internet check karo ya thodi der me dobara try karo.</p><button class="retrybtn" onclick="loadProducts()">Retry</button>';
+    PRODUCTS = FALLBACK_PRODUCTS;
+    state.style.display='none'; buildChips(); render();
   });
 }
 
