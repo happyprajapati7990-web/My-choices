@@ -61,6 +61,18 @@ header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px s
 [data-theme="dark"] .off{color:#5fd68a}
 .shopbtn{display:block;text-align:center;background:var(--accent);color:#fff;font-weight:700;font-size:14px;padding:11px;border-radius:10px;text-decoration:none}
 .shopbtn:hover{background:var(--accent-dark)}
+/* livebar + trending */
+.livebar{text-align:center;font-size:12.5px;color:var(--muted);padding:8px 16px 0}
+.livebar b{color:var(--text)}
+#trending{padding:4px 0}
+.trendTitle{font-size:16px;font-weight:800;margin:10px 0}
+.trendRow{display:flex;gap:12px;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:none}
+.trendRow::-webkit-scrollbar{display:none}
+.tcard{flex:0 0 150px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;text-decoration:none;box-shadow:var(--shadow);position:relative}
+.tcard img{width:100%;height:110px;object-fit:cover;display:block;background:#e9e2d6}
+.trank{position:absolute;top:6px;left:6px;background:#ff6b00;color:#fff;font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px}
+.tname{display:block;font-size:12.5px;font-weight:600;padding:8px 10px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tclicks{display:block;font-size:11px;color:var(--muted);padding:0 10px 8px}
 /* states */
 .state{text-align:center;padding:60px 20px;color:var(--muted)}
 .state h2{color:var(--text);margin-bottom:8px;font-size:20px}
@@ -84,10 +96,13 @@ footer a{color:var(--muted)}
 </header>
 <div class="disclosure">💡 My Choices may earn a commission when you buy through links on this page — at no extra cost to you.</div>
 <div class="wrap">
+  <div class="livebar" id="visitors"></div>
+  <div id="trending" style="display:none"></div>
   <div class="chips" id="chips"></div>
   <div class="toolbar">
     <div class="count" id="count"></div>
     <select class="sortsel" id="sort">
+      <option value="new">Sort: Newest First</option>
       <option value="featured">Sort: Featured</option>
       <option value="low">Price: Low to High</option>
       <option value="high">Price: High to Low</option>
@@ -112,7 +127,36 @@ const SHEET_WEB_URL = "https://docs.google.com/spreadsheets/d/11SkJRSO9GX-t_ynEn
 
 const $ = id => document.getElementById(id);
 const grid=$('grid'), state=$('state'), chipsEl=$('chips'), countEl=$('count');
-let PRODUCTS=[], activeCat='All', query='', sortBy='featured';
+let PRODUCTS=[], activeCat='All', query='', sortBy='new';
+
+/* ============ visitor + click tracking (free counter, koi setup nahi) ============ */
+const COUNT_NS='mychoices-hp7990';
+const cslug=(p,i)=>(String(p.name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,50)||('p'+i));
+const fire=u=>{ try{ fetch(u,{mode:'cors',keepalive:true}).catch(()=>{}); }catch(e){} };
+function loadVisitors(){
+  const el=$('visitors');
+  fetch('https://api.countapi.xyz/hit/'+COUNT_NS+'/visits').then(r=>r.json()).then(d=>{
+    if(d&&d.value!=null) el.innerHTML='👁️ <b>'+Number(d.value).toLocaleString('en-IN')+'</b> logon ne ye website dekhi';
+    else el.style.display='none';
+  }).catch(()=>{ el.style.display='none'; });
+}
+function loadTrending(){
+  const box=$('trending'); if(!box||!PRODUCTS.length) return;
+  const get1=u=>Promise.race([fetch(u).then(r=>r.json()).catch(()=>null),new Promise(res=>setTimeout(()=>res(null),3500))]);
+  Promise.all(PRODUCTS.map(p=>get1('https://api.countapi.xyz/get/'+COUNT_NS+'/click_'+encodeURIComponent(p._id)).then(d=>({p,c:(d&&d.value)||0})))).then(all=>{
+    const top=all.filter(x=>x.c>0).sort((a,b)=>b.c-a.c).slice(0,5);
+    if(!top.length){ box.style.display='none'; return; }
+    box.style.display='block';
+    box.innerHTML='<div class="trendTitle">🔥 Trending Now</div><div class="trendRow">'+top.map((t,r)=>{
+      const buy=t.p.link||('https://www.amazon.in/s?k='+encodeURIComponent(t.p.name));
+      return `<a class="tcard" href="${esc(buy)}" target="_blank" rel="noopener sponsored" data-id="${esc(t.p._id)}">`
+        +`<span class="trank">#${r+1}</span>`
+        +(t.p.img?`<img loading="lazy" src="${esc(t.p.img)}" alt="" onerror="this.style.display='none'">`:'')
+        +`<span class="tname">${esc(t.p.name)}</span><span class="tclicks">👆 ${t.c} clicks</span></a>`;
+    }).join('')+'</div>';
+    box.querySelectorAll('.tcard').forEach(a=>a.addEventListener('click',()=>fire('https://api.countapi.xyz/hit/'+COUNT_NS+'/click_'+encodeURIComponent(a.dataset.id))));
+  }).catch(()=>{ box.style.display='none'; });
+}
 let saved=[]; try{ saved=JSON.parse(localStorage.getItem('sf_saved')||'[]'); }catch(e){}
 
 /* ---------- CSV parse (quoted commas safe) ---------- */
@@ -149,7 +193,8 @@ function loadProducts(){
       tag:String(r[7]||'').trim()
     })).filter(p=>p.name);
     if(!PRODUCTS.length) throw 0;
-    state.style.display='none'; buildChips(); render();
+    PRODUCTS.forEach((p,i)=>p._id=cslug(p,i));
+    state.style.display='none'; buildChips(); render(); loadVisitors(); loadTrending();
   }).catch(()=>{
     state.innerHTML='<h2>Products load nahi ho rahe 😅</h2><p>Internet check karo ya thodi der me dobara try karo.</p><button class="retrybtn" onclick="loadProducts()">Retry</button>';
   });
@@ -166,6 +211,7 @@ function filtered(){
   let list=PRODUCTS.filter(p=>(activeCat==='All'||p.cat===activeCat));
   if(query){ const ql=query.toLowerCase(); list=list.filter(p=>(p.name+' '+p.desc+' '+p.cat).toLowerCase().includes(ql)); }
   const off=p=>p.mrp>p.price?Math.round((p.mrp-p.price)/p.mrp*100):0;
+  if(sortBy==='new') list=[...list].reverse();
   if(sortBy==='low') list=[...list].sort((a,b)=>a.price-b.price);
   if(sortBy==='high') list=[...list].sort((a,b)=>b.price-a.price);
   if(sortBy==='off') list=[...list].sort((a,b)=>off(b)-off(a));
@@ -193,10 +239,11 @@ function render(){
         <div class="cname">${esc(p.name)}</div>
         ${p.desc?`<div class="cdesc">${esc(p.desc)}</div>`:''}
         <div class="prow"><span class="price">${inr(p.price)}</span>${p.mrp>p.price?`<span class="mrp">${inr(p.mrp)}</span>`:''}</div>
-        <a class="shopbtn" href="${esc(buy)}" target="_blank" rel="noopener sponsored">Shop Now 🛒</a>
+        <a class="shopbtn" href="${esc(buy)}" target="_blank" rel="noopener sponsored" data-id="${esc(p._id)}">Shop Now 🛒</a>
       </div>
     </div>`;
   }).join('');
+  grid.querySelectorAll('.shopbtn').forEach(a=>a.addEventListener('click',()=>fire('https://api.countapi.xyz/hit/'+COUNT_NS+'/click_'+encodeURIComponent(a.dataset.id))));
   grid.querySelectorAll('.savebtn').forEach(b=>b.onclick=e=>{
     e.preventDefault(); const p=filtered().list[+b.dataset.s]; const k=p.name+p.price;
     if(saved.includes(k)){saved=saved.filter(x=>x!==k);}else{saved.push(k);}
