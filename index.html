@@ -79,6 +79,16 @@ header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px s
 .state h2{color:var(--text);margin-bottom:8px;font-size:20px}
 .state p{font-size:14px;max-width:420px;margin:0 auto 16px}
 .retrybtn{background:var(--text);color:var(--bg);border:none;padding:10px 24px;border-radius:999px;font-size:14px;cursor:pointer}
+/* ads (Adsterra banners) */
+.adslot{text-align:center;margin:18px auto;max-width:100%;overflow:hidden}
+.adslot .adlabel{font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.ad-desktop{display:none}
+@media(min-width:768px){.ad-desktop{display:block}}
+.ad-mobile{display:block}
+@media(min-width:768px){.ad-mobile{display:none}}
+.ad-468{display:none}
+@media(min-width:500px){.ad-468{display:block}}
+.adrow{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;align-items:flex-start;margin:18px auto}
 /* footer */
 footer{border-top:1px solid var(--line);padding:28px 0 40px;font-size:13px;color:var(--muted)}
 footer .cols{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between}
@@ -110,8 +120,84 @@ footer a{color:var(--muted)}
       <option value="off">Biggest Discount</option>
     </select>
   </div>
+  <!-- Adsterra top banner: 728x90 desktop / 320x50 mobile -->
+  <div class="adslot ad-desktop"><div class="adlabel">Advertisement</div>
+<script>
+  atOptions = {
+    'key' : '0b866aa286a6419fde783c0a9a06bfb7',
+    'format' : 'iframe',
+    'height' : 90,
+    'width' : 728,
+    'params' : {}
+  };
+</script>
+<script src="https://bicea.org/22/0b866aa286a6419fde783c0a9a06bfb7"></script>
+  </div>
+  <div class="adslot ad-mobile"><div class="adlabel">Advertisement</div>
+<script>
+  atOptions = {
+    'key' : '0483d0112c3a2279b2b6af3a2a2007cc',
+    'format' : 'iframe',
+    'height' : 50,
+    'width' : 320,
+    'params' : {}
+  };
+</script>
+<script src="https://bicea.org/22/0483d0112c3a2279b2b6af3a2a2007cc"></script>
+  </div>
   <div class="grid" id="grid"></div>
   <div class="state" id="state" style="display:none"></div>
+  <!-- Adsterra bottom banners -->
+  <div class="adrow">
+    <div class="adslot"><div class="adlabel">Advertisement</div>
+<script>
+  atOptions = {
+    'key' : '367fa6a871b3eb576ced2595d9c3aea2',
+    'format' : 'iframe',
+    'height' : 250,
+    'width' : 300,
+    'params' : {}
+  };
+</script>
+<script src="https://bicea.org/22/367fa6a871b3eb576ced2595d9c3aea2"></script>
+    </div>
+    <div class="adslot"><div class="adlabel">Advertisement</div>
+<script>
+  atOptions = {
+    'key' : '54ee40e0fe0ba555cff979d7b9721b16',
+    'format' : 'iframe',
+    'height' : 600,
+    'width' : 160,
+    'params' : {}
+  };
+</script>
+<script src="https://bicea.org/22/54ee40e0fe0ba555cff979d7b9721b16"></script>
+    </div>
+    <div class="adslot"><div class="adlabel">Advertisement</div>
+<script>
+  atOptions = {
+    'key' : '02c36bdf6a13138755810421f1cfaf80',
+    'format' : 'iframe',
+    'height' : 300,
+    'width' : 160,
+    'params' : {}
+  };
+</script>
+<script src="https://bicea.org/22/02c36bdf6a13138755810421f1cfaf80"></script>
+    </div>
+  </div>
+  <div class="adslot ad-468"><div class="adlabel">Advertisement</div>
+<script>
+  atOptions = {
+    'key' : '3d180c77e5c78f5901d2742c458a2d6c',
+    'format' : 'iframe',
+    'height' : 60,
+    'width' : 468,
+    'params' : {}
+  };
+</script>
+<script src="https://bicea.org/22/3d180c77e5c78f5901d2742c458a2d6c"></script>
+  </div>
 </div>
 <footer>
   <div class="wrap cols">
